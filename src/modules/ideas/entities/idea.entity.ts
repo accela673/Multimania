@@ -16,6 +16,9 @@ export class IdeaEntity extends BaseEntity {
   @Column()
   usefulLink: string;
 
+  @Column({ nullable: true })
+  lastEdited: Date;
+
   @OneToMany(() => UserEntity, (user) => user.startups, {
     cascade: true,
   })

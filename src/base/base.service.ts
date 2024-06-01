@@ -17,6 +17,31 @@ export abstract class BaseService<T extends BaseEntity> {
       .getOne();
   }
 
+  async checkTimeLimit(date: Date, limitInHours: number) {
+    if (!date) {
+      return;
+    }
+    const currentDate = new Date();
+    if (!(date instanceof Date)) {
+      date = new Date(date);
+    }
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date');
+    }
+
+    const timeDifference = currentDate.getTime() - date.getTime();
+    const hoursDifference = timeDifference / (1000 * 60 * 60);
+
+    if (hoursDifference <= limitInHours) {
+      const remainingMinutes = (limitInHours - hoursDifference) * 60;
+      throw new BadRequestException(
+        `Remaining time to use this feature: ${Math.floor(
+          remainingMinutes,
+        )} minutes`,
+      );
+    }
+  }
+
   async getWithRelations(id: number, entity: string, relations?: string[]) {
     const query = this.repository
       .createQueryBuilder(entity)
@@ -39,6 +64,7 @@ export abstract class BaseService<T extends BaseEntity> {
     delete user.isConfirmed;
     delete user.role;
     delete user.createdAt;
+    return user;
   }
 
   async checkIfExcist(obj: any, name: string, id: any) {

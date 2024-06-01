@@ -38,6 +38,8 @@ export class IdeaService extends BaseService<IdeaEntity> {
   }
 
   async createIdea(dto: CreateIdeaDto, userId: number) {
+    const user = await this.userService.findById(userId);
+    await this.checkTimeLimit(user.starupTimeLimit, 12);
     const idea = await this.ideaRepository.create();
     idea.usefulLink = dto.usefulLink;
     idea.name = dto.name;
@@ -46,7 +48,7 @@ export class IdeaService extends BaseService<IdeaEntity> {
       const image = await this.fileService.createImage(dto.image);
       idea.imageUrl = image.url;
     }
-    const user = await this.userService.findById(userId);
+    user.starupTimeLimit = new Date();
     user.ideas.push(idea);
     await this.userService.saveUser(user);
     return await this.ideaRepository.save(idea);
@@ -75,11 +77,13 @@ export class IdeaService extends BaseService<IdeaEntity> {
       where: { id: ideaId, author: { id: userId } },
       relations: ['author'],
     });
+    await this.checkTimeLimit(idea.lastEdited, 12);
     if (dto.image) {
       const image = await this.fileService.createImage(dto.image);
       idea.imageUrl = image.url;
     }
     delete dto.image;
+    idea.lastEdited = new Date();
     Object.assign(idea, dto);
     return await this.ideaRepository.save(idea);
   }

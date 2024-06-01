@@ -2,6 +2,7 @@ import { BaseEntity } from 'src/base/base.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { UserRole } from '../enums/roles.enum';
 import { IdeaEntity } from 'src/modules/ideas/entities/idea.entity';
+import { ThemeEnum } from '../enums/theme.enum';
 
 @Entity()
 export class UserEntity extends BaseEntity {
@@ -18,7 +19,7 @@ export class UserEntity extends BaseEntity {
   password: string;
 
   @Column({ nullable: true })
-  link: string;
+  usefulLink: string;
 
   @Column({ nullable: true })
   pfp: string;
@@ -32,12 +33,28 @@ export class UserEntity extends BaseEntity {
   @Column({ default: false })
   isConfirmed: boolean;
 
+  @Column({ nullable: true })
+  editProfileTimeLimit: Date;
+
+  @Column({ nullable: true })
+  starupTimeLimit: Date;
+
+  @Column({ nullable: true })
+  changePfpTimeLimit: Date;
+
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.USER,
   })
   role: UserRole;
+
+  @Column({
+    type: 'enum',
+    enum: ThemeEnum,
+    default: ThemeEnum.LIGHT,
+  })
+  colorTheme: ThemeEnum;
 
   @OneToMany(() => IdeaEntity, (idea) => idea.author, {
     cascade: true,

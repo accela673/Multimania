@@ -12,6 +12,9 @@ import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { UserRole } from '../enums/roles.enum';
 import { LoginDto } from '../dto/login-dto';
+import { FileService } from 'src/modules/file/file.service';
+import { EditUserDto } from '../dto/edit.profile.dto';
+import { ThemeEnum } from '../enums/theme.enum';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -21,6 +24,7 @@ export class UserService extends BaseService<UserEntity> {
     @InjectRepository(CodeEntity)
     private readonly codeRepository: Repository<CodeEntity>,
     private readonly emailService: EmailService,
+    private readonly fileService: FileService,
   ) {
     super(userRepository);
   }
@@ -79,6 +83,24 @@ export class UserService extends BaseService<UserEntity> {
 
   async saveUser(user: UserEntity) {
     return await this.userRepository.save(user);
+  }
+
+  async editUser(dto: EditUserDto, userId: number) {
+    const user = await this.findById(userId);
+    await this.checkTimeLimit(user.editProfileTimeLimit, 24);
+    Object.assign(user, dto);
+    user.editProfileTimeLimit = new Date();
+    return await this.saveUser(user);
+  }
+
+  async changeTheme(id: number, name: string) {
+    const user = await this.findById(id);
+    if (name.toUpperCase() in ThemeEnum) {
+      user.colorTheme = name.toUpperCase() as ThemeEnum;
+      await this.saveUser(user);
+      return { message: `Successfully changed to ${name.toUpperCase()} theme` };
+    }
+    return;
   }
 
   async create(user: CreateUserDto) {
@@ -216,6 +238,18 @@ export class UserService extends BaseService<UserEntity> {
       );
     }
     return code;
+  }
+
+  async setPfp(file: Express.Multer.File, userId: number) {
+    const user = await this.findById(userId);
+    await this.checkTimeLimit(user.changePfpTimeLimit, 24);
+    if (file) {
+      const image = await this.fileService.createImage(file);
+      user.pfp = image.url;
+    }
+    user.changePfpTimeLimit = new Date();
+    await this.saveUser(user);
+    return { message: 'Success' };
   }
 
   async deleteCode(code: CodeEntity) {
