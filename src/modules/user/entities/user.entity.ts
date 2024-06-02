@@ -25,6 +25,9 @@ export class UserEntity extends BaseEntity {
   pfp: string;
 
   @Column({ nullable: true })
+  aboutMe: string;
+
+  @Column({ nullable: true })
   confirmCodeId: number;
 
   @Column({ nullable: true })

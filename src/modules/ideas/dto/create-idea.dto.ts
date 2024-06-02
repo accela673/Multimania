@@ -11,7 +11,7 @@ export class CreateIdeaDto extends BaseDto {
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(500)
+  @MaxLength(1000)
   description: string;
 
   @IsOptional()

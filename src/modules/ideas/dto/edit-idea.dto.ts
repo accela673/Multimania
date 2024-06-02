@@ -12,7 +12,7 @@ export class EditIdeaDto extends BaseDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(500)
+  @MaxLength(1000)
   description: string;
 
   @IsOptional()

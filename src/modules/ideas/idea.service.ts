@@ -28,7 +28,7 @@ export class IdeaService extends BaseService<IdeaEntity> {
     await this.checkIfExcist(idea, 'idea', id);
     idea = await this.ideaRepository.findOne({
       where: { id: id },
-      relations: ['author', 'members'],
+      relations: ['author', 'members', 'requests'],
     });
     await this.clearPrivateData(idea.author);
     for (let i = 0; i < idea.members.length; i++) {
@@ -86,5 +86,101 @@ export class IdeaService extends BaseService<IdeaEntity> {
     idea.lastEdited = new Date();
     Object.assign(idea, dto);
     return await this.ideaRepository.save(idea);
+  }
+
+  async getRequests(userId: number, ideaId: number) {
+    const user = await this.userService.findById(userId);
+    const team = await this.getIdea(ideaId);
+    if (team.author.id !== user.id) {
+      throw new BadRequestException('You are not the author');
+    }
+    for (let i = 0; i < team.requests.length; i++) {
+      await this.clearPrivateData(team.requests[i]);
+    }
+    return team.requests;
+  }
+
+  async applyToTeam(userId: number, teamId: number) {
+    const user = await this.userService.findById(userId);
+    const team = await this.getIdea(teamId);
+    if (team.author.id === user.id) {
+      throw new BadRequestException('You are the author');
+    }
+    let hasInTeam = false;
+    for (let i = 0; i < team.members.length; i++) {
+      if (team.members[i].id === user.id) {
+        hasInTeam = true;
+      }
+    }
+    if (hasInTeam) {
+      throw new BadRequestException('You are already in team');
+    }
+    team.requests.push(user);
+    await this.ideaRepository.save(team);
+    return { message: 'Success!' };
+  }
+
+  async addToTeam(userId: number, authorId: number, teamId: number) {
+    const user = await this.userService.findById(userId);
+    const team = await this.getIdea(teamId);
+    if (team.author.id !== authorId) {
+      throw new BadRequestException('You are not the author');
+    }
+    if (team.author.id === user.id) {
+      throw new BadRequestException('You are the author');
+    }
+    let hasInRequests = false;
+    for (let i = 0; i < team.requests.length; i++) {
+      if (team.requests[i].id === user.id) {
+        hasInRequests = true;
+      }
+    }
+    let hasInTeam = false;
+    for (let i = 0; i < team.members.length; i++) {
+      if (team.members[i].id === user.id) {
+        hasInTeam = true;
+      }
+    }
+    if (hasInTeam) {
+      throw new BadRequestException('User is already in team');
+    }
+    if (!hasInRequests) {
+      throw new BadRequestException('User not found in requests');
+    }
+    team.members.push(user);
+    await this.ideaRepository.save(team);
+    return { message: 'Success!' };
+  }
+
+  async declineRequest(userId: number, authorId: number, teamId: number) {
+    const user = await this.userService.findById(userId);
+    const team = await this.getIdea(teamId);
+    if (team.author.id !== authorId) {
+      throw new BadRequestException('You are not the author');
+    }
+    if (team.author.id === user.id) {
+      throw new BadRequestException('You are the author');
+    }
+    let hasInRequests = false;
+    for (let i = 0; i < team.requests.length; i++) {
+      if (team.requests[i].id === user.id) {
+        hasInRequests = true;
+      }
+    }
+    let hasInTeam = false;
+    for (let i = 0; i < team.members.length; i++) {
+      if (team.members[i].id === user.id) {
+        hasInTeam = true;
+      }
+    }
+    if (hasInTeam) {
+      throw new BadRequestException('User is already in team');
+    }
+    if (!hasInRequests) {
+      throw new BadRequestException('User not found in requests');
+    }
+    team.requests.splice(team.requests.indexOf(user));
+    await this.ideaRepository.save(team);
+    return { message: 'Success!' };
   }
 }

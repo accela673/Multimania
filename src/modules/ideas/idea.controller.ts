@@ -40,7 +40,9 @@ export class IdeaController {
   @ApiOperation({ summary: 'Найти стартап' })
   @Get(':id')
   async getIdeaById(@Param('id') id: string) {
-    return await this.ideaService.getIdea(+id);
+    const idea = await this.ideaService.getIdea(+id);
+    delete idea.requests;
+    return idea;
   }
 
   @ApiTags('Стартапы')
@@ -139,5 +141,53 @@ export class IdeaController {
   @Delete('my/:id')
   async deleteIdea(@Param('id') id: string, @Req() req) {
     return await this.ideaService.deleteIdea(+id, req.user.id);
+  }
+
+  @ApiTags('Заявки на вступление в мою команду')
+  @ApiOperation({ summary: 'Получить список заявок на мой стартап' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('get/requests/to/team/:id')
+  async getRequests(@Param('id') teamId: string, @Req() req) {
+    return await this.ideaService.getRequests(+req.user.id, +teamId);
+  }
+
+  @ApiTags('Заявки на вступление в мою команду')
+  @ApiOperation({ summary: 'Отклонить определенную заявку на стартап' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('decline/request/to/team/:userId/:teamId')
+  async declineRequest(
+    @Param('teamId') teamId: string,
+    @Param('userId') userId: string,
+    @Req() req,
+  ) {
+    return await this.ideaService.declineRequest(
+      +userId,
+      +req.user.id,
+      +teamId,
+    );
+  }
+
+  @ApiTags('Заявки на вступление в мою команду')
+  @ApiOperation({ summary: 'Принять определенную заявку на стартап' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('approve/request/to/team/:userId/:teamId')
+  async approveRequest(
+    @Param('teamId') teamId: string,
+    @Param('userId') userId: string,
+    @Req() req,
+  ) {
+    return await this.ideaService.addToTeam(+userId, +req.user.id, +teamId);
+  }
+
+  @ApiTags('Вступление в команды')
+  @ApiOperation({ summary: 'Подать заявку на вступление на стартап' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('apply/to/team/:id')
+  async applyToStartup(@Param('id') teamId: string, @Req() req) {
+    return await this.ideaService.applyToTeam(+req.user.id, +teamId);
   }
 }

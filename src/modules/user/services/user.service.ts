@@ -149,12 +149,10 @@ export class UserService extends BaseService<UserEntity> {
     let user = this.userRepository.findOne({
       where: { id: id },
     });
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
+    await this.checkIfExcist(user, 'user', id);
     user = this.userRepository.findOne({
       where: { id: id },
-      relations: ['ideas'],
+      relations: ['ideas', 'ideas.members', 'ideas.requests'],
     });
     return user;
   }
