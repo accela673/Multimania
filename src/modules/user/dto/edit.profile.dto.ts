@@ -26,12 +26,12 @@ export class EditUserDto extends BaseDto {
   @IsUrl()
   usefulLink: string;
 
-  // @IsOptional()
-  // @ApiProperty({
-  //   example:
-  //     'Im lame Java developer and I havent showered since Java 1.0 version released',
-  // })
-  // @IsString()
-  // @MaxLength(1000)
-  // aboutMe: string;
+  @IsOptional()
+  @ApiProperty({
+    example:
+      'Im lame Java developer and I havent showered since Java 1.0 version released',
+  })
+  @IsString()
+  @MaxLength(1000)
+  aboutMe: string;
 }

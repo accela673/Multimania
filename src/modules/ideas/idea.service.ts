@@ -7,6 +7,7 @@ import { CreateIdeaDto } from './dto/create-idea.dto';
 import { UserService } from '../user/services/user.service';
 import { FileService } from '../file/file.service';
 import { EditIdeaDto } from './dto/edit-idea.dto';
+import { UserEntity } from '../user/entities/user.entity';
 
 @Injectable()
 export class IdeaService extends BaseService<IdeaEntity> {
@@ -106,6 +107,13 @@ export class IdeaService extends BaseService<IdeaEntity> {
     if (team.author.id === user.id) {
       throw new BadRequestException('You are the author');
     }
+    await this.checkIfInTeam(team, user);
+    team.requests.push(user);
+    await this.ideaRepository.save(team);
+    return { message: 'Success!' };
+  }
+
+  private async checkIfInTeam(team: IdeaEntity, user: UserEntity) {
     let hasInTeam = false;
     for (let i = 0; i < team.members.length; i++) {
       if (team.members[i].id === user.id) {
@@ -115,9 +123,18 @@ export class IdeaService extends BaseService<IdeaEntity> {
     if (hasInTeam) {
       throw new BadRequestException('You are already in team');
     }
-    team.requests.push(user);
-    await this.ideaRepository.save(team);
-    return { message: 'Success!' };
+  }
+
+  private async checkIfInReq(team: IdeaEntity, user: UserEntity) {
+    let hasInRequests = false;
+    for (let i = 0; i < team.requests.length; i++) {
+      if (team.requests[i].id === user.id) {
+        hasInRequests = true;
+      }
+    }
+    if (!hasInRequests) {
+      throw new BadRequestException('User not found in requests');
+    }
   }
 
   async addToTeam(userId: number, authorId: number, teamId: number) {
@@ -129,24 +146,8 @@ export class IdeaService extends BaseService<IdeaEntity> {
     if (team.author.id === user.id) {
       throw new BadRequestException('You are the author');
     }
-    let hasInRequests = false;
-    for (let i = 0; i < team.requests.length; i++) {
-      if (team.requests[i].id === user.id) {
-        hasInRequests = true;
-      }
-    }
-    let hasInTeam = false;
-    for (let i = 0; i < team.members.length; i++) {
-      if (team.members[i].id === user.id) {
-        hasInTeam = true;
-      }
-    }
-    if (hasInTeam) {
-      throw new BadRequestException('User is already in team');
-    }
-    if (!hasInRequests) {
-      throw new BadRequestException('User not found in requests');
-    }
+    await this.checkIfInTeam(team, user);
+    await this.checkIfInReq(team, user);
     team.members.push(user);
     await this.ideaRepository.save(team);
     return { message: 'Success!' };
@@ -161,24 +162,8 @@ export class IdeaService extends BaseService<IdeaEntity> {
     if (team.author.id === user.id) {
       throw new BadRequestException('You are the author');
     }
-    let hasInRequests = false;
-    for (let i = 0; i < team.requests.length; i++) {
-      if (team.requests[i].id === user.id) {
-        hasInRequests = true;
-      }
-    }
-    let hasInTeam = false;
-    for (let i = 0; i < team.members.length; i++) {
-      if (team.members[i].id === user.id) {
-        hasInTeam = true;
-      }
-    }
-    if (hasInTeam) {
-      throw new BadRequestException('User is already in team');
-    }
-    if (!hasInRequests) {
-      throw new BadRequestException('User not found in requests');
-    }
+    await this.checkIfInTeam(team, user);
+    await this.checkIfInReq(team, user);
     team.requests.splice(team.requests.indexOf(user));
     await this.ideaRepository.save(team);
     return { message: 'Success!' };
