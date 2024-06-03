@@ -60,7 +60,7 @@ export class UserController {
 
   @ApiTags('Профиль пользователя')
   @ApiOperation({ summary: 'Изменить фото профиля' })
-  @Patch(':id')
+  @Patch('change/pfp')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
