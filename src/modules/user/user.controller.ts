@@ -28,21 +28,21 @@ import { EditUserDto } from './dto/edit.profile.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiTags('Users')
+  @ApiTags('Пользователи')
   @ApiOperation({ summary: 'Get list of all users' })
   @Get()
   async getAll() {
     return await this.userService.getAllUsers();
   }
 
-  @ApiTags('Users')
+  @ApiTags('Пользователи')
   @ApiOperation({ summary: 'Get one user by id' })
   @Get(':id')
   async getById(@Param('id') id: number) {
     return await this.userService.get(id);
   }
 
-  @ApiTags('Users')
+  @ApiTags('Пользователи')
   @ApiOperation({ summary: 'Delete user by id' })
   @Delete(':id')
   async deleteById(@Param('id') id: number) {

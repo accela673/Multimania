@@ -19,9 +19,8 @@ import { LoginDto } from '../user/dto/login-dto';
 import { ForgotPasswordDto } from '../user/dto/forgot-password.dto';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 import { ChangePasswordDto } from '../user/dto/change-password.dto';
-import { UserRole } from '../user/enums/roles.enum';
 
-@ApiTags('Authentication')
+@ApiTags('Регистрация')
 @Controller('auth')
 export class AuthController {
   constructor(

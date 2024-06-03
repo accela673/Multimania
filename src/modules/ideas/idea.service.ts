@@ -21,7 +21,7 @@ export class IdeaService extends BaseService<IdeaEntity> {
   }
 
   async listIdeas() {
-    return await this.ideaRepository.find();
+    return await this.ideaRepository.find({ relations: ['author', 'members'] });
   }
 
   async getIdea(id: number) {
