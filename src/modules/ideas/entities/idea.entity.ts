@@ -16,6 +16,15 @@ export class IdeaEntity extends BaseEntity {
   @Column()
   usefulLink: string;
 
+  @Column({nullable: true})
+  firstLink: string;
+
+  @Column({nullable:true,default:null})
+  secondLink: string;
+
+  @Column({nullable:true, default:null})
+  thirdLink: string;
+
   @Column({ nullable: true })
   lastEdited: Date;
 

@@ -8,6 +8,7 @@ import { UserService } from '../user/services/user.service';
 import { FileService } from '../file/file.service';
 import { EditIdeaDto } from './dto/edit-idea.dto';
 import { UserEntity } from '../user/entities/user.entity';
+import { InsertLinkDto } from './dto/insert-link.dto';
 
 @Injectable()
 export class IdeaService extends BaseService<IdeaEntity> {
@@ -167,5 +168,26 @@ export class IdeaService extends BaseService<IdeaEntity> {
     team.requests.splice(team.requests.indexOf(user));
     await this.ideaRepository.save(team);
     return { message: 'Success!' };
+  }
+
+  async insertLink(userId: number, dto: InsertLinkDto, teamId: number, numberOfLink: number){
+    const team = await this.getIdea(teamId)
+    if(team.author.id!==userId){
+        throw new BadRequestException('You are not the author')
+      }
+    switch (numberOfLink) {
+      case 1:
+        team.firstLink = dto.link;
+        break;
+      case 2:
+        team.secondLink = dto.link;
+        break;
+      case 3:
+        team.thirdLink = dto.link;
+        break;
+      default:
+        throw new BadRequestException('Invalid link number');
+      }
+    return {message: "Success!"}
   }
 }

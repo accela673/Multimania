@@ -24,6 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateIdeaDto } from './dto/create-idea.dto';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { EditIdeaDto } from './dto/edit-idea.dto';
+import { InsertLinkDto } from './dto/insert-link.dto';
 
 @Controller('ideas')
 export class IdeaController {
@@ -141,6 +142,25 @@ export class IdeaController {
   @Delete('my/:id')
   async deleteIdea(@Param('id') id: string, @Req() req) {
     return await this.ideaService.deleteIdea(+id, req.user.id);
+  }
+
+  @ApiTags('Мои стартапы')
+  @ApiOperation({ summary: 'Вставить ссылку' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('insert/link/to/progress/:teamId/numberOfLink')
+  async insertLink(
+    @Param('teamId') teamId: string,
+    @Param('numberOfLink') numberOfLink: string,
+    @Req() req,
+    @Body() insertLinkDto:InsertLinkDto
+  ) {
+    return await this.ideaService.insertLink(
+      +req.user.id,
+      insertLinkDto,
+      +teamId,
+      +numberOfLink
+    );
   }
 
   @ApiTags('Заявки на вступление в мою команду')
