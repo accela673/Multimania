@@ -188,6 +188,7 @@ export class IdeaService extends BaseService<IdeaEntity> {
       default:
         throw new BadRequestException('Invalid link number');
       }
+    await this.ideaRepository.save(team) 
     return {message: "Success!"}
   }
 }

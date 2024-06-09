@@ -145,7 +145,7 @@ export class IdeaController {
   }
 
   @ApiTags('Мои стартапы')
-  @ApiOperation({ summary: 'Вставить ссылку' })
+  @ApiOperation({ summary: 'Вставить ссылку в прогресс' })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Patch('insert/link/to/progress/:teamId/numberOfLink')
