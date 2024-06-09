@@ -18,28 +18,28 @@ export abstract class BaseService<T extends BaseEntity> {
   }
 
   async checkTimeLimit(date: Date, limitInHours: number) {
-    // if (!date) {
-    //   return;
-    // }
-    // const currentDate = new Date();
-    // if (!(date instanceof Date)) {
-    //   date = new Date(date);
-    // }
-    // if (isNaN(date.getTime())) {
-    //   throw new Error('Invalid date');
-    // }
+    if (!date) {
+      return;
+    }
+    const currentDate = new Date();
+    if (!(date instanceof Date)) {
+      date = new Date(date);
+    }
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date');
+    }
 
-    // const timeDifference = currentDate.getTime() - date.getTime();
-    // const hoursDifference = timeDifference / (1000 * 60 * 60);
+    const timeDifference = currentDate.getTime() - date.getTime();
+    const hoursDifference = timeDifference / (1000 * 60 * 60);
 
-    // if (hoursDifference <= limitInHours) {
-    //   const remainingMinutes = (limitInHours - hoursDifference) * 60;
-    //   throw new BadRequestException(
-    //     `Remaining time to use this feature: ${Math.floor(
-    //       remainingMinutes,
-    //     )} minutes`,
-    //   );
-    // }
+    if (hoursDifference <= limitInHours) {
+      const remainingMinutes = (limitInHours - hoursDifference) * 60;
+      throw new BadRequestException(
+        `Remaining time to use this feature: ${Math.floor(
+          remainingMinutes,
+        )} minutes`,
+      );
+    }
     return;
   }
 
