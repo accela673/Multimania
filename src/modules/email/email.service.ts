@@ -49,15 +49,4 @@ export class EmailService {
 
     return this.sendMail(mailOptions);
   }
-
-  async sendEmailToAdmin(data: ConfirmEmailDto) {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: data.email,
-      subject: 'Multimania Admin Confirmation',
-      text: `Your admin confirmation code is: ${data.code} Do not give it to anyone! This code will expire in 15 minutes`,
-    };
-
-    return this.sendMail(mailOptions);
-  }
 }

@@ -33,17 +33,6 @@ export class UserService extends BaseService<UserEntity> {
     return await this.userRepository.findOne({ where: { email: email } });
   }
 
-  async createAdmin(loginDto: LoginDto) {
-    const admin = new CreateUserDto();
-    admin.firstName = 'Journal';
-    admin.email = loginDto.email;
-    admin.password = loginDto.password;
-    admin.lastName = 'Admin';
-    const newAdmin = await this.userRepository.create(admin);
-    newAdmin.role = UserRole.ADMIN;
-    return await this.userRepository.save(newAdmin);
-  }
-
   async checkIfEmailExcist(email: string): Promise<UserEntity | undefined> {
     const user = await this.findOneUser(email);
     if (!user) {
@@ -78,7 +67,7 @@ export class UserService extends BaseService<UserEntity> {
       .sort(() => Math.random() - 0.5)
       .join('');
 
-    return randomString.toUpperCase();
+    return randomString;
   }
 
   async saveUser(user: UserEntity) {
@@ -123,24 +112,6 @@ export class UserService extends BaseService<UserEntity> {
     const emailDto = new ConfirmEmailDto();
     emailDto.code = code.confirmCode;
     emailDto.email = user.email;
-    if (
-      user.email == process.env.ADMIN_EMAIL &&
-      user.password !== process.env.ADMIN_PASSWORD
-    ) {
-      throw new BadRequestException("This email can't be registered");
-    }
-    if (
-      user.email == process.env.ADMIN_EMAIL &&
-      user.password == process.env.ADMIN_PASSWORD
-    ) {
-      const admin = await this.findOneUser(user.email);
-      if (!admin) {
-        newUser.role = UserRole.ADMIN;
-        await this.emailService.sendEmailToAdmin(emailDto);
-        return this.userRepository.save(newUser);
-      }
-      return { message: 'Email is already taken' };
-    }
     await this.emailService.sendEmail(emailDto);
     return this.userRepository.save(newUser);
   }

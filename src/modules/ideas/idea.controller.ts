@@ -167,8 +167,8 @@ export class IdeaController {
   @ApiOperation({ summary: 'Получить список заявок на мой стартап' })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Get('get/requests/to/team/:id')
-  async getRequests(@Param('id') teamId: string, @Req() req) {
+  @Get('get/requests/to/:teamId')
+  async getRequests(@Param('teamId') teamId: string, @Req() req) {
     return await this.ideaService.getRequests(+req.user.id, +teamId);
   }
 
