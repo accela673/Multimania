@@ -169,7 +169,16 @@ export class IdeaController {
   @ApiBearerAuth()
   @Get('get/requests/to/:teamId')
   async getRequests(@Param('teamId') teamId: string, @Req() req) {
-    return await this.ideaService.getRequests(+req.user.id, +teamId);
+    const userId = Number(req.user.id);
+    const parsedTeamId = Number(teamId);
+
+    if (isNaN(userId)) {
+      throw new BadRequestException(`User id: ${req.user.id} is have to be number`);
+    }
+    if (isNaN(parsedTeamId)) {
+      throw new BadRequestException(`Team id: ${teamId} is have to be number`);
+    }
+    return await this.ideaService.getRequests(userId, parsedTeamId);
   }
 
   @ApiTags('Заявки на вступление в мою команду')
