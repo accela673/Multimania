@@ -105,12 +105,26 @@ export class IdeaService extends BaseService<IdeaEntity> {
   async applyToTeam(userId: number, teamId: number) {
     const user = await this.userService.findById(userId);
     const team = await this.getIdea(teamId);
+
     if (team.author.id === user.id) {
       throw new BadRequestException('You are the author');
     }
+
     await this.checkIfInTeam(team, user);
+
+    if (!user.startups) {
+      user.startups = [];
+    }
+    user.startups.push(team);
+
+    if (!team.requests) {
+      team.requests = [];
+    }
     team.requests.push(user);
+
+    await this.userService.saveUser(user); 
     await this.ideaRepository.save(team);
+
     return { message: 'Success!' };
   }
 
@@ -190,5 +204,28 @@ export class IdeaService extends BaseService<IdeaEntity> {
       }
     await this.ideaRepository.save(team) 
     return {message: "Success!"}
+  }
+
+  async leaveTeam(userId: number, teamId:number){
+    const team = await this.getIdea(teamId)
+    for (let i = 0; i < team.members.length; i++ ){
+      if(team.members[i].id === userId){
+        team.members.splice(i,1)
+        const user = await this.userService.findById(userId)
+        for (let j = 0; j < user.startups.length; j++){
+          if(user.startups[j].id == teamId){
+            user.startups.splice(j,1)
+            await this.userService.saveUser(user)
+          }
+        }
+        await this.ideaRepository.save(team)
+      }
+    }
+    return team.members
+  }
+
+  async getTeams(userId: number){
+    const user = await this.userService.findById(userId)
+    return user
   }
 }

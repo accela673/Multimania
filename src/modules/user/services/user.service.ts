@@ -123,7 +123,7 @@ export class UserService extends BaseService<UserEntity> {
     await this.checkIfExcist(user, 'user', id);
     user = this.userRepository.findOne({
       where: { id: id },
-      relations: ['ideas', 'ideas.members', 'ideas.requests'],
+      relations: ['ideas', 'ideas.members', 'ideas.requests', 'startups'],
     });
     return user;
   }

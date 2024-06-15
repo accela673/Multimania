@@ -222,4 +222,13 @@ export class IdeaController {
   async applyToStartup(@Param('id') teamId: string, @Req() req) {
     return await this.ideaService.applyToTeam(+req.user.id, +teamId);
   }
+
+  @ApiTags('Вступление в команды')
+  @ApiOperation({ summary: 'Выйти из стартапа' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('leave/team/:id')
+  async leaveStartUp(@Param('id') teamId: string, @Req() req) {
+    return await this.ideaService.leaveTeam(+req.user.id, +teamId);
+  }
 }

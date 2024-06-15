@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/base/base.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()
 export class IdeaEntity extends BaseEntity {
@@ -28,8 +28,11 @@ export class IdeaEntity extends BaseEntity {
   @Column({ nullable: true })
   lastEdited: Date;
 
-  @OneToMany(() => UserEntity, (user) => user.startups, {
-    cascade: true,
+  @ManyToMany(() => UserEntity, (user) => user.startups)
+  @JoinTable({
+    name: 'startup_memberships',
+    joinColumn: { name: 'startupId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
   })
   members: UserEntity[];
 

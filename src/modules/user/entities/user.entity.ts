@@ -1,5 +1,5 @@
 import { BaseEntity } from 'src/base/base.entity';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { UserRole } from '../enums/roles.enum';
 import { IdeaEntity } from 'src/modules/ideas/entities/idea.entity';
 import { ThemeEnum } from '../enums/theme.enum';
@@ -64,11 +64,13 @@ export class UserEntity extends BaseEntity {
   })
   ideas: IdeaEntity[];
 
-  @ManyToOne(() => IdeaEntity, (idea) => idea.members, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+  @ManyToMany(() => IdeaEntity, (idea) => idea.members)
+  @JoinTable({
+    name: 'startup_memberships',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'startupId', referencedColumnName: 'id' },
   })
-  startups: IdeaEntity;
+  startups: IdeaEntity[];
 
   @ManyToOne(() => IdeaEntity, (idea) => idea.requests, {
     onDelete: 'CASCADE',
