@@ -148,7 +148,7 @@ export class IdeaController {
   @ApiOperation({ summary: 'Вставить ссылку в прогресс' })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Patch('insert/link/to/progress/:teamId/numberOfLink')
+  @Patch('insert/link/to/progress/:teamId/:numberOfLink')
   async insertLink(
     @Param('teamId') teamId: string,
     @Param('numberOfLink') numberOfLink: string,
